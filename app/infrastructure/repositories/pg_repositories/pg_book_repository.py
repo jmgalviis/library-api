@@ -16,7 +16,12 @@ class PGBookRepository(BookRepository):
         pass
 
     def get_by_author_or_year(self, author: str, year: int) -> Book:
-        pass
+        query = self._db.query(Book)
+        if author:
+            query = query.filter(Book.author == author)
+        if year:
+            query = query.filter(Book.year == year)
+        return query.all()
 
     def search(self, query: str) -> Book:
         pass

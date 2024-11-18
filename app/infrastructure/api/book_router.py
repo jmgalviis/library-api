@@ -16,6 +16,8 @@ def add_book(book: BookCreate, db: Session = Depends(get_db)):
     return book_use_case.add_book(book)
 
 
-@book_router.get("/books")
+@book_router.get("/books/")
 def list_books(author: str = None, year: int = None, db: Session = Depends(get_db)):
-    pass
+    book_use_case = BookUseCase(repository=PGBookRepository(db=db))
+    return book_use_case.get_books_by_author_or_year(author=author, year=year)
+
