@@ -9,6 +9,16 @@ class BookBase(BaseModel):
     year: int
     isbn: str
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "title": "The Great Gatsby",
+                "author": "F. Scott Fitzgerald",
+                "year": 1925,
+                "isbn": "9780743273565",
+            }
+        }
+
 
 class BookCreate(BookBase):
     pass
@@ -25,4 +35,13 @@ class BookResponse(BookBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "title": "The Great Gatsby",
+                "author": "F. Scott Fitzgerald",
+                "year": 1925,
+                "isbn": "9780743273565",
+            }
+        }
