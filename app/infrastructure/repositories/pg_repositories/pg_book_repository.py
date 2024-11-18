@@ -1,3 +1,7 @@
+from typing import List
+
+from sqlalchemy import or_, cast, String
+
 from app.application.use_cases.repositories import BookRepository
 from app.domain.book import Book
 
@@ -27,7 +31,15 @@ class PGBookRepository(BookRepository):
         return query.all()
 
     def search(self, query: str) -> Book:
-        pass
+        results = self._db.query(Book).filter(
+            or_(
+                Book.title.ilike(f"%{query}%"),
+                Book.author.ilike(f"%{query}%"),
+                cast(Book.year, String).ilike(f"%{query}%"),
+                Book.isbn.ilike(f"%{query}%")
+            )
+        ).all()
+        return results
 
     def update(self, book: Book, updates: dict) -> Book:
         if book:
@@ -37,5 +49,12 @@ class PGBookRepository(BookRepository):
             self._db.refresh(book)
         return book
 
-    def delete(self, book_id: int) -> Book:
-        pass
+    def delete(self, book: Book) -> Book:
+        try:
+            self._db.delete(book)
+            self._db.commit()
+        except Exception as e:
+            raise ValueError(f"Error deleting book: {e}")
+
+    def get_all(self) -> List[Book]:
+        return self._db.query(Book).all()

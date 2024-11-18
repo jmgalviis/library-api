@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from typing import List
 
 from app.domain.book import Book
 
@@ -25,6 +26,10 @@ class BookRepository(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def delete(self, book_id: int) -> Book:
+    def delete(self, book: Book) -> Book:
+        pass
+
+    @abstractmethod
+    def get_all(self) -> List[Book]:
         pass
 
