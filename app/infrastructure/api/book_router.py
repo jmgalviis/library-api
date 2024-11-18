@@ -21,3 +21,15 @@ def list_books(author: str = None, year: int = None, db: Session = Depends(get_d
     book_use_case = BookUseCase(repository=PGBookRepository(db=db))
     return book_use_case.get_books_by_author_or_year(author=author, year=year)
 
+
+@book_router.get("/books/{book_id}")
+def get_book_by_id(book_id: int, db: Session = Depends(get_db)):
+    book_use_case = BookUseCase(repository=PGBookRepository(db=db))
+    return book_use_case.get_by_id(book_id=book_id)
+
+
+@book_router.put("/books/{book_id}/")
+def update_book(book_id: int, updates: dict, db: Session = Depends(get_db)):
+    book_use_case = BookUseCase(repository=PGBookRepository(db=db))
+    return book_use_case.update(book_id=book_id, updates=updates)
+

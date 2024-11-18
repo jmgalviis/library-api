@@ -38,7 +38,6 @@ def test_search_books_by_author(client):
     assert books[0]["author"] == book_data["author"]
 
 
-# Test: Buscar libros por título
 def test_search_books_by_title(client):
     response = client.get("/api/v1/books/search/", params={"query": book_data["title"]})
     assert response.status_code == 200
@@ -47,13 +46,11 @@ def test_search_books_by_title(client):
     assert books[0]["title"] == book_data["title"]
 
 
-# Test: Actualizar un libro
 def test_update_book(client):
-    # Obtener el ID del libro
-    response = client.get("/api/v1/books/")
-    book_id = response.json()[0]["id"]
+    response = client.post("/api/v1/books/", json=book_data)
+    assert response.status_code == 200
+    book_id = response.json()["id"]
 
-    # Actualizar el libro
     response = client.put(f"/api/v1/books/{book_id}/", json=updated_book_data)
     assert response.status_code == 200
     updated_book = response.json()
@@ -61,18 +58,35 @@ def test_update_book(client):
     assert updated_book["year"] == updated_book_data["year"]
 
 
-# Test: Eliminar un libro
 def test_delete_book(client):
-    # Obtener el ID del libro
     response = client.get("/api/v1/books/")
     book_id = response.json()[0]["id"]
 
-    # Eliminar el libro
     response = client.delete(f"/api/v1/books/{book_id}/")
     assert response.status_code == 200
     assert response.json()["message"] == "Book deleted successfully"
 
-    # Verificar que el libro ya no existe
     response = client.get("/api/v1/books/")
     books = response.json()
     assert len(books) == 0
+
+
+def test_get_book_by_id(client):
+    response = client.post("/api/v1/books/", json=book_data)
+    assert response.status_code == 200
+    book_id = response.json()["id"]
+
+    response = client.get(f"/api/v1/books/{book_id}/")
+    assert response.status_code == 200, f"Unexpected status code: {response.status_code}"
+    book = response.json()
+    assert book["id"] == book_id
+    assert book["title"] == book_data["title"]
+
+
+def test_add_duplicate_book(client):
+    response = client.post("/api/v1/books/", json=book_data)
+    assert response.status_code == 200
+
+    response = client.post("/api/v1/books/", json=book_data)
+    assert response.status_code == 400
+    assert response.json()["detail"] == f"A book with ISBN {book_data['isbn']} already exists."

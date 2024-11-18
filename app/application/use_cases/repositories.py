@@ -21,7 +21,7 @@ class BookRepository(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def update(self, book_id: int) -> Book:
+    def update(self, book: Book, updates: dict) -> Book:
         pass
 
     @abstractmethod
